@@ -13,7 +13,7 @@ cada quadro, `steps()`, `pausas.toml` + `cortar.py`, véu entre cenas, números 
 Como plugin (igual ao `cemep-lab`):
 
 ```
-/plugin marketplace add /Users/hugocemep/GitHub/mpl-animation
+/plugin marketplace add hugogontijomachado/mpl-animation     # ou o caminho local: /Users/hugocemep/GitHub/mpl-animation
 /plugin install mpl-animation@mpl-animation
 ```
 
