@@ -1,0 +1,56 @@
+{
+  "skill_name": "mpl-animation",
+  "evals": [
+    {
+      "id": 1,
+      "name": "chromatography-class",
+      "prompt": "Preciso de uma animação para minha aula de química analítica mostrando como uma coluna de cromatografia separa dois compostos: a mistura é injetada, os dois compostos andam pela coluna com velocidades diferentes (um interage mais com a fase estacionária) e, conforme saem da coluna, vão desenhando dois picos no cromatograma ao lado. Texto na tela em português. Quero conseguir pausar e explicar cada etapa durante a aula.",
+      "expected_output": "Stepwise animation (scenes/steps with a pause after each), MP4 1080p, cut into clips at the pauses with a pause sheet; Portuguese on-screen text; the compound that interacts more with the stationary phase elutes later and its peak is drawn as it leaves the column.",
+      "files": [],
+      "assertions": [
+        "Delivers an MP4 video at 1920x1080, H.264, yuv420p",
+        "The video is cut into at least 4 clips",
+        "Every clip ends on a still frame (last frame equals the frame 0.1 s before)",
+        "Clips join seamlessly (last frame of each clip = first frame of the next)",
+        "On-screen text is in Portuguese",
+        "The compound that interacts more with the stationary phase moves slower and elutes later, and its peak is drawn in the chromatogram as it leaves the column (column and chromatogram share one clock)",
+        "Each teaching step ends in a pause (one clip per step) and the user is told how to change the pauses"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "gradient-descent-readme-gif",
+      "prompt": "Faz um GIF curto (uns 10 segundos) pro README do meu repositório de otimização mostrando o gradiente descendente achando o mínimo de uma função de duas variáveis, com as curvas de nível e o caminho dos passos. Texto em inglês.",
+      "expected_output": "A short GIF (~10 s, README-sized) of real gradient descent steps on contour lines, English text; built in steps; clips optional.",
+      "files": [],
+      "assertions": [
+        "Delivers a GIF",
+        "GIF lasts between 6 and 15 s",
+        "GIF is README-sized: width <= 1000 px and file <= 8 MB",
+        "GIF loops forever",
+        "GIF holds its final state for at least 1 s before looping",
+        "The path comes from a real gradient-descent computation (gradient evaluated at every step), not drawn by hand",
+        "On-screen text is in English"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "calibration-curve-pptx",
+      "prompt": "Tenho os dados da curva de calibração da cafeína em calibracao_cafeina.csv (concentração em mg/L e área do pico). Anima a construção da curva para a minha apresentação de amanhã: os padrões aparecendo, a reta ajustada, a equação e o R², e no final a concentração de uma amostra desconhecida com área 48210. Vou apresentar no PowerPoint, então já me entrega os trechos com pausas num .pptx. Texto em português.",
+      "expected_output": "MP4 + clips at pauses + a .pptx with one clip per slide; slope, intercept, R² and the unknown concentration computed from the CSV (not typed in); Portuguese text.",
+      "files": [
+        "evals/files/calibracao_cafeina.csv"
+      ],
+      "assertions": [
+        "Delivers an MP4 video at 1920x1080, H.264, yuv420p",
+        "The video is cut into at least 4 clips",
+        "Every clip ends on a still frame (last frame equals the frame 0.1 s before)",
+        "Clips join seamlessly (last frame of each clip = first frame of the next)",
+        "Delivers a .pptx with one clip per slide",
+        "Every slide's video starts automatically (no click needed)",
+        "Slope, intercept, R² and the unknown concentration on screen are computed from the CSV (≈4721.5, ≈637, R² ≈ 0.9999, ≈10.08 mg/L), not typed in",
+        "On-screen text is in Portuguese"
+      ]
+    }
+  ]
+}
