@@ -64,7 +64,7 @@ Como o último quadro do trecho k é o primeiro do trecho k+1 (o corte já é fe
 
 ### Notas do apresentador
 
-Uma linha por clique: `clique k · <início>–<fim> s · <comentário>`, em que o comentário é o da pausa
+Uma linha por clique: `click k · <início>–<fim> s · <comentário>` (em inglês, como o resto da skill), em que o comentário é o da pausa
 correspondente no `pauses.toml` (`# k  <texto>`; o último é o da linha `(to the end)`). Os comentários são lidos do
 texto da seção (o `tomllib` os descarta).
 
@@ -137,10 +137,10 @@ A receita 4 de `recipes.md` ("zooming an axis") passa a apontar para o estilo; o
 Texto na tela em inglês, como o `example.py`. Tema: uma história curta da visualização de dados.
 
 - **Dados no topo**:
-  - `ERAS`: (início, fim, rótulo, nome, detalhes, lado);
-  - `EVENTS`: (ano, nome, 1–2 linhas de detalhe, lado, cor);
+  - `MILESTONES`: uma lista só, na ordem de entrada — (início, fim, rótulo do ano, nome, linhas de detalhe, lado,
+    cor); fim = início num marco, fim > início numa era;
   - `RANGES`: os intervalos do eixo, `(1750, 2030)` e `(1990, 2030)`;
-  - asserts: os rótulos cabem (`text_w`), os marcos estão dentro do intervalo em que aparecem.
+  - asserts: os rótulos cabem na tela e não encostam no vizinho do mesmo lado (`text_w`).
 - **Funções do estilo**:
   - `X(year, rng)`: ano → x; com `rng = (r0, r1, z)` mistura os dois mapeamentos (cada marco anda em linha reta
     durante o zoom);
@@ -148,12 +148,14 @@ Texto na tela em inglês, como o `example.py`. Tema: uma história curta da visu
   - `era(...)` / `event(...)`: barra ou ponto no eixo, haste, ano (pequeno, `MUTED`), nome (negrito), detalhes
     (`INK_2`), acima ou abaixo do eixo; parâmetro `dim` (0–1) leva tudo para o cinza;
   - `card(img, x, y, h, a, marks)`: o `image()` do motor, com marca-texto.
-- **Cena 1, a visão longa** (1750–2030): o eixo cresce; um marco por passo — Playfair 1786 (gráficos de linha e de
-  barra), a era de ouro dos gráficos estatísticos (barra 1850–1900), Nightingale 1858, Minard 1869, Tukey 1977
-  (boxplot, análise exploratória); ao entrar um marco, os anteriores esmaecem; alguns marcos trazem um cartão.
-- **Cena 2, o zoom** (→ 1990–2030): o eixo desliza; entram matplotlib 2003, D3.js 2011, Jupyter 2014; linha final
-  de conclusão em negrito.
-- Por volta de 35–45 s e 9 pausas.
+- **Cena 1, a visão longa** (1750–2030): o eixo cresce; um passo por vez — Playfair 1786 (gráficos de linha e de
+  barra); a era de ouro dos gráficos estatísticos (barra 1850–1900) com a linha "1858 · Nightingale"; a linha
+  "1869 · Minard" da mesma era (como marcos separados os rótulos de 1858 e 1869 se sobrepõem: viram as duas linhas de
+  detalhe da era, cada uma no seu passo); Tukey 1977 (boxplot, análise exploratória). Ao entrar um marco, os
+  anteriores esmaecem; cada passo traz um cartão.
+- **Cena 2, o zoom** (→ 1990–2030): os cartões saem, o eixo desliza; entram matplotlib 2003, D3.js 2011, Jupyter
+  2014; linha final de conclusão em negrito.
+- Por volta de 25 s, 8 pausas (9 trechos).
 - **Fatos**: cada data e afirmação conferida na web durante a implementação, com a fonte no docstring. Se algum
   fato da lista acima estiver errado, entra o correto.
 - **Prints**: gerados no próprio script, sem imagens de terceiros no repositório — mini-figuras redesenhadas no
