@@ -177,7 +177,7 @@ def build_pptx(videos, dst, bar=BAR, logo=None):
     from pptx import Presentation
     from pptx.dml.color import RGBColor
     from pptx.enum.shapes import MSO_SHAPE
-    from pptx.enum.text import MSO_ANCHOR
+    from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE
     from pptx.oxml import parse_xml
     from pptx.oxml.ns import qn
     from pptx.util import Emu, Pt
@@ -192,18 +192,21 @@ def build_pptx(videos, dst, bar=BAR, logo=None):
         band.fill.fore_color.rgb = RGBColor.from_string(bar)
         band.line.fill.background()
         band.shadow.inherit = False
-        box = slide.shapes.add_textbox(TITLE_X, 0, SLIDE_W - TITLE_X - 2 * LOGO_MARGIN - LOGO_H, BAR_H)
+        right = SLIDE_W - LOGO_MARGIN  # where the title must end: before the logo, if there is one
+        if logo:
+            pic = slide.shapes.add_picture(str(logo), 0, (BAR_H - LOGO_H) // 2, height=LOGO_H)
+            pic.left = SLIDE_W - LOGO_MARGIN - pic.width
+            pic.name = "logo"
+            right = pic.left - LOGO_MARGIN
+        box = slide.shapes.add_textbox(TITLE_X, 0, right - TITLE_X, BAR_H)
         box.name = "title"
+        box.text_frame.auto_size = MSO_AUTO_SIZE.NONE  # else PowerPoint shrinks it to the text when it is edited
         box.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
         box.text_frame.word_wrap = True
         r = box.text_frame.paragraphs[0].add_run()
         r.text = title
         r.font.name, r.font.size, r.font.bold = "Arial", Pt(32), True
         r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        if logo:
-            pic = slide.shapes.add_picture(str(logo), 0, (BAR_H - LOGO_H) // 2, height=LOGO_H)
-            pic.left = SLIDE_W - LOGO_MARGIN - pic.width
-            pic.name = "logo"
         spids, durs = [], []
         for k, (mp4, poster, dur, vw, vh) in enumerate(clips, 1):
             movie = slide.shapes.add_movie(str(mp4), *video_box(vw, vh), poster_frame_image=str(poster),

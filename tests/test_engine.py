@@ -114,6 +114,23 @@ def test_deck_round_trip(tmp_path):
         cut.check_deck(deck, videos[:1])
 
 
+def test_title_stays_centered_in_the_bar_and_clear_of_a_wide_logo(tmp_path):
+    from pptx import Presentation
+    from pptx.enum.text import MSO_AUTO_SIZE
+
+    clip = make_clip(tmp_path / "a1.mp4")
+    logo = tmp_path / "logo.png"  # 2:1
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "color=c=white:s=400x200",
+                    "-frames:v", "1", str(logo)], check=True)
+    deck = tmp_path / "deck.pptx"
+    cut.build_pptx([("A long title that could run under the logo", [clip], ["click 1"])], deck, cut.BAR, logo)
+    shapes = {s.name: s for s in Presentation(deck).slides[0].shapes}
+    title, pic = shapes["title"], shapes["logo"]
+    assert title.text_frame.auto_size == MSO_AUTO_SIZE.NONE  # PowerPoint keeps it as tall as the bar when edited
+    assert title.top == 0 and title.height == cut.BAR_H
+    assert title.left + title.width <= pic.left
+
+
 def test_refuses_an_open_deck(tmp_path):
     deck = tmp_path / "deck.pptx"
     cut.refuse_if_open(deck)  # nothing open: fine
