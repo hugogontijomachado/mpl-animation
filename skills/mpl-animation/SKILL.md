@@ -1,41 +1,48 @@
 ---
 name: mpl-animation
-description: Build animated explainer videos with matplotlib - scenes made of steps, each step ending in a pause, rendered to MP4 (default) or GIF and then cut into clips at the pauses (one clip per slide, optionally a ready PowerPoint deck), so a presenter can talk between movements. Use it whenever someone wants to animate something with Python or matplotlib - a concept, a scientific process, an algorithm, real data, a paper figure - for a talk, class, thesis defense, video, website or README, even if they only say "make an animation/video/GIF of X", "anima isso", "faz um vídeo mostrando", "animação para a apresentação" or "trechos com pausas". Also use it to change, re-time, re-cut or make a new version of an existing matplotlib animation. Not for static figures or interactive dashboards.
+description: Build animated explainer videos with matplotlib - scenes made of steps, each step ending in a pause, rendered to MP4 or GIF and then cut into clips at the pauses, optionally with a ready PowerPoint deck where each click plays the next clip, so a presenter can talk between movements. Use it whenever someone wants to animate something with Python or matplotlib - a concept, a scientific process, an algorithm, real data, a paper figure - for a talk, class, thesis defense, video, website or README, even if they only say "make an animation/video/GIF of X", "anima isso", "faz um vídeo mostrando", "animação para a apresentação" or "trechos com pausas". Also use it to change, re-time, re-cut or make a new version of an existing matplotlib animation. Not for static figures or interactive dashboards.
 ---
 
 # Stepwise matplotlib animations
 
 matplotlib makes polished explainer videos when every frame is drawn from scratch as a function of time. This
-skill bundles a small engine for that (`scripts/anim.py`), a cutter (`scripts/cut.py`), a complete template
-(`scripts/example.py`), and the way of working that makes the videos good to present: build in steps, pause
-after every step, cut at the pauses.
+skill bundles a small engine for that (`scripts/anim.py`), a cutter that also builds the deck (`scripts/cut.py`),
+a complete template (`scripts/example.py`), and the way of working that makes the videos good to present: build in
+steps, pause after every step, cut at the pauses.
 
 ## The rule: build in steps, then cut into clips
 
 Every animation is a list of scenes, and every scene a list of steps: a step moves, then holds still. The holds
-are where the video is cut. In a slide deck each clip plays by itself and stops on its last frame while the
-presenter talks; the next click starts the next clip from exactly that frame. The audience sees one video that
-pauses; the presenter controls the pace.
+are where the video is cut. In the deck each video is one slide: a click plays a clip, which stops on its last
+frame while the presenter talks; the next click shows the next clip on top of it and plays it from exactly that
+frame. The audience sees one video that pauses; the presenter controls the pace.
 
-Default deliverables for every animation:
+## Ask what to deliver
 
-| What | Where |
+Before planning, ask what the user wants to get, in one round of questions (AskUserQuestion when available), and
+only what the request leaves open:
+
+1. **Format**: MP4, GIF, or both.
+2. **If MP4**: also a PowerPoint deck, each video on one slide whose clips play one per click?
+
+Read the request first. ".pptx", "PowerPoint", "slides" or "to present" means MP4 + deck: nothing to ask about the
+format. "GIF" alone means a GIF: nothing to ask. "Video" or "MP4" without a deck: ask only about the deck. A change,
+re-timing, re-cut or new version of an existing animation keeps the deliverables it already has: ask nothing. If the
+content fits a style (see Styles), offer it in the same round, next to "free", with the path of its `preview.gif`.
+
+| Choice | Deliverables |
 |---|---|
-| the video, 1920×1080, 30 fps, H.264 | `videos/<name>.mp4` (and its last frame, `videos/<name>.png`) |
-| the clips, cut at the pauses | `videos/clips/<name>/01.mp4`, `02.mp4`, … |
-| a sheet with the frame where each clip stops | `videos/clips/<name>_pauses.png` |
-| the cut points, one comment per stop | a `[<name>]` section in `animations/pauses.toml` |
+| GIF | `videos/<name>.gif` (`--gif`), 960 px, 20 fps; no clips (a GIF has no pause control); the MP4 it is made from stays in `videos/` |
+| MP4 | `videos/<name>.mp4` (1920×1080, 30 fps, H.264) and its last frame `videos/<name>.png`; the clips cut at the pauses, `videos/clips/<name>/01.mp4`, `02.mp4`, …; a sheet with the frame where each clip stops, `videos/clips/<name>_pauses.png`; the cut points, one comment per stop, in a `[<name>]` section of `animations/pauses.toml` |
+| MP4 + deck | all of the above, a slide title (`title`) in each video's section of `pauses.toml`, and `videos/clips/deck.pptx` (`cut.py --pptx`) |
 
-The user can ask for something else, and the engine covers it:
+Everything else has a default and is not asked: make it and say what you made. When the user asks for it:
 
-- **GIF** as well or instead: `--gif` on the script; `cut.py --gif` for clip GIFs that play once and hold.
-- **A deck ready to present**: `cut.py --pptx` (one full-screen autoplay clip per slide, in `pauses.toml` order).
 - **One continuous video** (website, social media): render and skip the cut. Still build it in steps: it costs
   nothing, and the pause checks keep catching half-finished frames.
 - **Another size, frame rate or aspect**: `W`, `H`, `FPS` at the top of `anim.py` (the canvas height follows).
-
-Don't ask about these unless the request is unclear and the answer changes the work: make the default and say
-what you made.
+- **Clip GIFs** that play once and hold: `cut.py --gif`.
+- **The deck's look**: `cut.py --pptx --bar '#RRGGBB' --logo <png>` (the title bar's color, a logo at its right end).
 
 ## Setup
 
@@ -55,23 +62,25 @@ what you made.
 
 ## Workflow
 
-1. **Plan** the scenes and steps, and what is on screen at each pause, in the script's docstring. If the user
+1. **Ask** what to deliver (above), unless the request already says it all.
+2. **Plan** the scenes and steps, and what is on screen at each pause, in the script's docstring. If the user
    asked for a proposal ("propose", "what do you think", "me proponha"), send the plan and wait. Otherwise build
    it and iterate: a finished draft gets better feedback than a description.
-2. **Write** the script from `example.py`: data and asserts at the top, one function per scene, `SCENES` last.
-3. **Check without rendering** (seconds each), and look at the PNGs with Read:
+3. **Write** the script from `example.py`: data and asserts at the top, one function per scene, `SCENES` last.
+4. **Check without rendering** (seconds each), and look at the PNGs with Read:
    - `--preview`: the last frame of each scene (layout, overlaps, clipped text);
    - `--frames 3.4 7.9`: any instants (transitions, the middle of a movement);
    - `--sheet`: the frame at every pause on one image, with a warning for pauses where something still moves.
-4. **Render**: `uv run animations/<script>.py` (`--gif` too, if wanted). It takes about 0.5–3× the video's
+5. **Render**: `uv run animations/<script>.py` (`--gif` too, if chosen). It takes about 0.5–3× the video's
    length at 1080p, depending on how much is drawn; run long renders in the background. `--draft` renders at half
    size and 15 fps to judge the motion before the full render.
-5. **Pauses**: the first render writes the video's section into `pauses.toml`, with an automatic comment per stop.
-   Replace each comment with what is on screen there: it documents the clips for whoever presents. Later renders
-   never overwrite a section; when the timing changed they print the new pauses, and you update the section.
-6. **Cut**: `uv run animations/cut.py <name>` (with `--gif` and `--pptx` as needed), then look at
+6. **Pauses**: the first render writes the video's section into `pauses.toml`, with an automatic comment per stop.
+   Replace each comment with what is on screen there: it documents the clips for whoever presents and becomes the
+   presenter note of that click in the deck. With a deck, set the video's `title` too: it is the slide title. Later
+   renders never overwrite a section; when the timing changed they print the new pauses, and you update the section.
+7. **Cut**: `uv run animations/cut.py <name>` (with `--gif` and `--pptx` as chosen), then look at
    `videos/clips/<name>_pauses.png`, which is made from the real MP4.
-7. **Verify and report** (last section).
+8. **Verify and report** (last section).
 
 ## Writing a scene
 
@@ -164,11 +173,17 @@ These defaults produced consistent, readable talks. Keep them unless the project
 
 ## Output formats
 
-- **MP4 (default)**: H.264, yuv420p, crf 18, BT.709 tags, faststart, 30 fps, 1920×1080. It plays in PowerPoint,
+- **MP4**: H.264, yuv420p, crf 18, BT.709 tags, faststart, 30 fps, 1920×1080. It plays in PowerPoint,
   Keynote, Google Slides, browsers and phones.
 - **GIF** (`--gif`): 960 px wide, 20 fps, with a palette made for the video. Good for READMEs, docs and chats. Its
   limits: 256 colors (gradients band), files grow fast with motion and length (keep GIFs under ~15 s), no sound and
   no pause control. To present, prefer MP4 clips; `cut.py --gif` makes clip GIFs that play once and hold.
+- **Deck** (`cut.py --pptx`): `videos/clips/deck.pptx`, one 16:9 slide per video: a title bar (`#232751` by
+  default, `--bar`; the video's `title`; `--logo` at its right end) and under it the video's clips, stacked at the
+  largest size that fits. Clip 1 plays on the first click; each next click shows the next clip and plays it. The
+  presenter notes list each click with its pause comment. `cut.py` checks the deck after saving and will not
+  overwrite it while PowerPoint has it open. By hand, and in Keynote or Google Slides: `references/recipes.md`,
+  section 14.
 - Vertical video, WebM, 60 fps and other variants: `references/recipes.md`.
 
 ## Before saying it's done
@@ -178,8 +193,9 @@ These defaults produced consistent, readable talks. Keep them unless the project
    nothing overlaps or is cut off, and that nothing appears before its time.
 2. Delete `videos/preview/` (scratch output).
 3. Tell the user: the files, the duration and the number of clips; how to change the pauses (edit `pauses.toml`,
-   run `cut.py` again); and every fact or number on screen they should double-check, separating what the script
-   computed from what was typed in.
+   run `cut.py` again); with a deck, that it was checked in structure and should be played once in presentation
+   mode on the presenting computer; and every fact or number on screen they should double-check, separating what
+   the script computed from what was typed in.
 
 ## More
 

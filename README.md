@@ -24,10 +24,14 @@ Precisa de [uv](https://docs.astral.sh/uv/) e `ffmpeg`.
 ## Usar
 
 É só pedir: "faz uma animação mostrando como a coluna separa dois compostos", "anima essa curva de calibração para
-a apresentação", "um GIF para o README mostrando o gradiente descendente". A skill copia o motor para
-`<projeto>/animations/` e segue a regra: planejar as etapas → conferir quadros sem renderizar → renderizar → cortar
-em trechos → conferir a folha de pausas → listar os fatos na tela para você conferir. Tudo isso é padrão, não
-obrigação: dá para pedir só o GIF, um vídeo contínuo sem cortes, o `.pptx` montado, outro tamanho.
+a apresentação", "um GIF para o README mostrando o gradiente descendente". A skill primeiro pergunta o que você quer
+receber — .gif e/ou .mp4 e, com .mp4, se quer também o `.pptx` — só o que o pedido não disse. Depois copia o motor
+para `<projeto>/animations/` e segue a regra: planejar as etapas → conferir quadros sem renderizar → renderizar →
+cortar em trechos → conferir a folha de pausas → listar os fatos na tela para você conferir.
+
+O `.pptx` tem um slide por vídeo: uma barra de título (cor e logo à escolha) e, embaixo, os trechos empilhados. O
+trecho 1 toca no primeiro clique e cada clique seguinte mostra e toca o próximo, então você encaixa a fala nas
+pausas. As notas do apresentador trazem o que está na tela em cada clique.
 
 ```bash
 uv run animations/<script>.py               # videos/<nome>.mp4 + último quadro; escreve as pausas em pauses.toml
@@ -36,7 +40,7 @@ uv run animations/<script>.py --sheet       # folha com o quadro de cada pausa, 
 uv run animations/<script>.py --preview     # último quadro de cada cena
 uv run animations/<script>.py --frames 3 7  # quadros avulsos
 uv run animations/<script>.py --draft       # meia resolução, 15 fps (conferir o movimento rápido)
-uv run animations/cut.py [vídeos] [--gif] [--pptx] [--sheet]   # trechos, folhas de pausas, GIFs dos trechos, deck
+uv run animations/cut.py [vídeos] [--gif] [--pptx] [--bar '#232751'] [--logo logo.png] [--sheet]
 ```
 
 ## O que tem aqui
@@ -45,7 +49,7 @@ uv run animations/cut.py [vídeos] [--gif] [--pptx] [--sheet]   # trechos, folha
 |---|---|
 | `skills/mpl-animation/SKILL.md` | a regra, o fluxo, convenções visuais e de conteúdo |
 | `skills/mpl-animation/scripts/anim.py` | o motor: tela 192×108, primitivas, `Panel`, `steps`, `Scene`, render, checagens |
-| `skills/mpl-animation/scripts/cut.py` | corta nos pontos de `pauses.toml`, folhas de pausas, GIFs dos trechos, `.pptx` com autoplay |
+| `skills/mpl-animation/scripts/cut.py` | corta nos pontos de `pauses.toml`, folhas de pausas, GIFs dos trechos, `.pptx` com um slide por vídeo e um clique por trecho |
 | `skills/mpl-animation/scripts/example.py` | modelo completo (média de varreduras e S/N), ponto de partida de cada animação nova |
 | `skills/mpl-animation/references/recipes.md` | receitas: continuar de outro vídeo, versões, zoom em linha do tempo, diagrama de sequência, imagens, idiomas, `FuncAnimation`, apresentar |
 

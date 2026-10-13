@@ -245,21 +245,27 @@ txt(96, 50, r"$P(x_{t+1} \mid x_1 \ldots x_t)$", size=30, ha="center")
 
 ## 14. Presenting the clips
 
-`cut.py --pptx` writes `videos/clips/deck.pptx`: 16:9, one clip per slide, full screen, starts automatically,
-no transitions, and a presenter note naming each clip. Copy its slides into the real deck (paste with "keep source
-formatting"). The deck is checked in structure; test it once in presentation mode on the presenting computer.
+`cut.py --pptx` writes `videos/clips/deck.pptx`: 16:9, one slide per video, a title bar on top (`--bar` color,
+`--logo`, the title from `title` in `pauses.toml`) and the video's clips stacked under it at the same place. Clip 1
+is on screen when the slide opens and plays on the first click; each further click shows the next clip on top and
+plays it. Each clip starts on the frame where the previous one stopped, so the audience sees one video that pauses.
+The presenter notes list each click with its pause comment. Copy the slides into the real deck (paste with "keep
+source formatting"). The deck is checked in structure; play it once in presentation mode on the presenting
+computer.
 
-By hand, on every slide:
+By hand:
 
-- **PowerPoint**: the clip full screen, always at the same position; Playback → Start: Automatically; "Rewind
-  after playing" off (keeps the last frame on screen); "Hide while not playing" off; Transitions → None.
-- **Keynote**: the clip full screen; in the Movie tab of the Format sidebar, start the movie automatically and set
-  Repeat to None; no transition.
-- **Google Slides**: insert the clip from Drive; Format options → Video playback → Play (automatically). Slides
-  shows a poster frame between clips, so the joins are less seamless.
+- **PowerPoint**, one slide per video: insert every clip at the same position and size, in order (01 at the back).
+  Animations: clip 01 → Play, "On Click"; each next clip → Appear, "On Click", then Play, "After Previous".
+  Playback: "Rewind after playing" off (keeps the last frame on screen), "Hide while not playing" off. Transitions →
+  None.
+- **Keynote**: one clip per slide, full size; in the Movie tab of the Format sidebar, start the movie automatically
+  and set Repeat to None; no transition.
+- **Google Slides**: one clip per slide, inserted from Drive; Format options → Video playback → Play
+  (automatically). Slides shows a poster frame between clips, so the joins are less seamless.
 
-While presenting, a click while a clip is still moving jumps to the next slide and cuts the movement: wait for it
-to stop.
+While presenting, a click while a clip is still moving starts the next one and cuts the movement: wait for it to
+stop.
 
 ## 15. Pitfalls
 
