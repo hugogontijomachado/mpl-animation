@@ -1,7 +1,7 @@
 {
   "name": "mpl-animation",
-  "description": "Animações em etapas com matplotlib: cenas com pausa a cada passo, render em MP4 (padrão) ou GIF, corte em trechos nas pausas e, se quiser, um .pptx pronto para apresentar.",
-  "version": "0.1.0",
+  "description": "Animações em etapas com matplotlib: cenas com pausa a cada passo, render em MP4 ou GIF, corte em trechos nas pausas, um .pptx em que cada clique toca o próximo trecho, e estilos prontos (linha do tempo).",
+  "version": "0.2.0",
   "author": {
     "name": "Hugo Gontijo Machado",
     "email": "hugogontijo@ufg.br"

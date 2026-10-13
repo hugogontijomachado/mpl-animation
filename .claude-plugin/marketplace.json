@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mpl-animation",
-  "description": "Skill de animações didáticas com matplotlib: vídeo em etapas, trechos com pausas, GIF e .pptx.",
+  "description": "Skill de animações didáticas com matplotlib: vídeo em etapas, trechos com pausas, GIF, .pptx por cliques e estilos prontos.",
   "owner": {
     "name": "Hugo Gontijo Machado",
     "email": "hugogontijo@ufg.br"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "mpl-animation",
-      "description": "Animações em etapas com matplotlib: cenas com pausa a cada passo, render em MP4 (padrão) ou GIF, corte em trechos nas pausas e, se quiser, um .pptx pronto para apresentar.",
+      "description": "Animações em etapas com matplotlib: cenas com pausa a cada passo, render em MP4 ou GIF, corte em trechos nas pausas, um .pptx em que cada clique toca o próximo trecho, e estilos prontos (linha do tempo).",
       "source": "./",
       "category": "productivity"
     }
