@@ -1,6 +1,6 @@
 ---
 name: mpl-animation
-description: Build animated explainer videos with matplotlib - scenes made of steps, each step ending in a pause, rendered to MP4 or GIF and then cut into clips at the pauses, optionally with a ready PowerPoint deck where each click plays the next clip, so a presenter can talk between movements. Use it whenever someone wants to animate something with Python or matplotlib - a concept, a scientific process, an algorithm, real data, a paper figure - for a talk, class, thesis defense, video, website or README, even if they only say "make an animation/video/GIF of X", "anima isso", "faz um vídeo mostrando", "animação para a apresentação" or "trechos com pausas". Also use it to change, re-time, re-cut or make a new version of an existing matplotlib animation. Not for static figures or interactive dashboards.
+description: Build animated explainer videos with matplotlib - scenes made of steps, each step ending in a pause, rendered to MP4 or GIF and then cut into clips at the pauses, optionally with a ready PowerPoint deck where each click plays the next clip, so a presenter can talk between movements. Use it whenever someone wants to animate something with Python or matplotlib - a concept, a scientific process, an algorithm, real data, a paper figure, a history or timeline - for a talk, class, thesis defense, video, website or README, even if they only say "make an animation/video/GIF of X", "anima isso", "faz um vídeo mostrando", "animação para a apresentação", "linha do tempo animada" or "trechos com pausas". Also use it to change, re-time, re-cut or make a new version of an existing matplotlib animation. Not for static figures or interactive dashboards.
 ---
 
 # Stepwise matplotlib animations
@@ -49,7 +49,8 @@ Everything else has a default and is not asked: make it and say what you made. W
 1. If the project already has its own animation engine (a canvas/render module, a pauses file, a CLAUDE.md that
    describes them), use it and its conventions instead. Consistency across a talk matters more than this engine.
 2. Otherwise copy `scripts/anim.py` and `scripts/cut.py` into `<project>/animations/`, and start every new
-   animation from a copy of `scripts/example.py`. Videos go to `<project>/videos/` (`OUT` in `anim.py`).
+   animation from a copy of `scripts/example.py`, or of a style's script (see Styles). Videos go to
+   `<project>/videos/` (`OUT` in `anim.py`).
 3. Run scripts with `uv run animations/<script>.py`: each declares its dependencies in a PEP 723 header, so there
    is no environment to manage. `ffmpeg` must be on the PATH. Without uv: Python ≥ 3.11 with numpy and matplotlib
    (python-pptx for decks).
@@ -196,6 +197,24 @@ These defaults produced consistent, readable talks. Keep them unless the project
    run `cut.py` again); with a deck, that it was checked in structure and should be played once in presentation
    mode on the presenting computer; and every fact or number on screen they should double-check, separating what
    the script computed from what was typed in.
+
+## Styles
+
+A style is a finished animation of a kind that comes back often, ready to copy and fill with new content. Offer one
+when the content has its shape, in the same round as the deliverable question; `sheet.png` shows you its stops,
+`preview.gif` shows the user.
+
+| Style | Fits when | Start from |
+|---|---|---|
+| timeline | history, chronology, milestones, project phases, releases: events in time, each seen in the context of the ones before, with a zoom when the story moves to a shorter period | `styles/timeline/timeline.py` |
+
+To use one: copy its script to `animations/<name>.py` (next to `anim.py`) and change `NAME`, the data at the top and
+the texts of the scenes; keep the style's functions. Its docstring says what to edit.
+
+To add a style: `styles/<style>/<style>.py`, a complete animation built on `anim.py` whose docstring says when it
+fits and what to edit; `sheet.png`, its pause sheet (`--sheet` writes `videos/preview/<name>_pauses.png`); and
+`preview.gif`, made from the render with `to_gif(mp4, "preview.gif", width=640, fps=12)` (at most 3 MB). Then one
+row in the table above.
 
 ## More
 

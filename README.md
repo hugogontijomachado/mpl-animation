@@ -43,6 +43,14 @@ uv run animations/<script>.py --draft       # meia resolução, 15 fps (conferir
 uv run animations/cut.py [vídeos] [--gif] [--pptx] [--bar '#232751'] [--logo logo.png] [--sheet]
 ```
 
+## Estilos
+
+Modelos prontos de animações que se repetem, para copiar e preencher. Quando o conteúdo combina com um estilo, a
+skill oferece junto com a pergunta do produto final, com a prévia. O primeiro é a **linha do tempo**
+(`styles/timeline/`): os marcos entram um a um acima e abaixo do eixo, os anteriores ficam cinza, prints entram ao
+lado com marca-texto, e o eixo dá zoom quando a história chega num período mais curto. Para criar um estilo novo: o
+`SKILL.md`, seção "Styles".
+
 ## O que tem aqui
 
 | Arquivo | Papel |
@@ -52,5 +60,6 @@ uv run animations/cut.py [vídeos] [--gif] [--pptx] [--bar '#232751'] [--logo lo
 | `skills/mpl-animation/scripts/cut.py` | corta nos pontos de `pauses.toml`, folhas de pausas, GIFs dos trechos, `.pptx` com um slide por vídeo e um clique por trecho |
 | `skills/mpl-animation/scripts/example.py` | modelo completo (média de varreduras e S/N), ponto de partida de cada animação nova |
 | `skills/mpl-animation/references/recipes.md` | receitas: continuar de outro vídeo, versões, zoom em linha do tempo, diagrama de sequência, imagens, idiomas, `FuncAnimation`, apresentar |
+| `skills/mpl-animation/styles/timeline/` | estilo linha do tempo: marcos um a um, os antigos esmaecem, cartões com marca-texto, zoom no eixo (`preview.gif`, `sheet.png`) |
 
 Checagem rápida do motor: `uv run --with numpy --with matplotlib skills/mpl-animation/scripts/anim.py`.

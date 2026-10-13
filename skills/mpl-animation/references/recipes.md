@@ -98,6 +98,9 @@ for year, label in EVENTS:
 
 A plot that zooms: build the `Panel` inside the scene function with `xlim=lerp(xl0, xl1, z)`, `ylim=lerp(yl0, yl1, z)`.
 
+The `timeline` style (`styles/timeline/timeline.py`) puts it all together: milestones entering one per step,
+earlier ones dimming, pictures beside them, and a zoom of the axis.
+
 ## 5. Sequence diagram
 
 Actors on top with dashed lifelines, messages as arrows that grow, activity bars on the lifelines.
