@@ -397,10 +397,10 @@ def _pixels():
 
 
 _TOML_HEAD = """\
-# Where each video is cut into clips (one clip per slide). Each number is an instant of the video, in seconds:
-# the clip before it stops on that frame and the next clip starts from it. Delete a number to merge two clips,
-# add one to split. Describe in each comment what is on screen at that stop.
-# Section order = slide order in `cut.py --pptx`.
+# Where each video is cut into clips. Each number is an instant of the video, in seconds: the clip before it stops
+# on that frame and the next clip starts from it. Delete a number to merge two clips, add one to split. Describe in
+# each comment what is on screen at that stop: it becomes the presenter note of that click in the deck.
+# `title` is the video's slide title in `cut.py --pptx`; section order = slide order.
 """
 
 
@@ -414,7 +414,7 @@ def sync_pauses(name, total, pauses):
         key = name if re.fullmatch(r"[A-Za-z0-9_-]+", name) else f'"{name}"'
         rows = [f"  {f'{t},':<8}# {k:<2} {scene}, step {j}" for k, (t, scene, j) in enumerate(pauses, 1)]
         rows.append(f"  {'':<8}# {len(pauses) + 1:<2} (to the end)")
-        block = "\n".join([f"\n[{key}]  # {total:.1f} s", "pauses = [", *rows, "]"])
+        block = "\n".join([f"\n[{key}]  # {total:.1f} s", f'title = "{name}"', "pauses = [", *rows, "]"])
         PAUSES_FILE.write_text(text.rstrip("\n") + "\n" + block + "\n")
         print(f"added [{name}] to {PAUSES_FILE.name}: replace the step comments with what is on screen")
     elif [float(x) for x in have.get("pauses", [])] != times:
