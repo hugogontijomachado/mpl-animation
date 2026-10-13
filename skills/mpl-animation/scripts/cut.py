@@ -75,24 +75,36 @@ def frame_png(src, f, dst):
     run("-i", str(src), "-vf", f"select=eq(n\\,{f})", "-frames:v", "1", str(dst))
 
 
-ROW = re.compile(r"^\s*(?:[\d.]+\s*,\s*)?#\s*(.*?)\s*$")  # a pause line with its comment, or a comment alone
+PAUSE_ROW = re.compile(r"^\s*[\d.]+\s*,?\s*(?:#\s*(.*?))?\s*$")  # a pause, with or without its comment
+COMMENT_ROW = re.compile(r"^\s*#\s*(.*?)\s*$")
+CLIP_NUMBER = re.compile(r"^(?:\d  |\d{2,} )")  # what anim.py writes in front of a comment: f"{k:<2} "
 
 
 def clip_comments(text, name):
     """The comment of each clip of video `name`, in order, from the text of pauses.toml (tomllib drops comments):
-    the one on each pause line, then the one after the last pause. The clip number anim.py writes in front of the
-    comment ("2  scene, step 1") is left out."""
-    head = re.compile(r'^\[\s*"?' + re.escape(name) + r'"?\s*\]')
-    out, inside = [], False
+    the one on each pause line ('' if none), then the first comment line after the last pause, for the last clip.
+    Comment lines between pauses (a deleted number, a pause commented out, a wrapped comment) are skipped, so note k
+    stays with clip k. The clip number anim.py writes in front of a comment is left out. [] if there is no section."""
+    head = re.compile(r'^\s*\[\s*"?' + re.escape(name) + r'"?\s*\]')
+    out, last, where = [], None, "before"
     for line in text.splitlines():
-        if head.match(line):
-            inside = True
-        elif inside and line.lstrip().startswith("["):
+        if where == "before":
+            where = "section" if head.match(line) else "before"
+        elif line.lstrip().startswith("["):  # the next section
             break
-        elif inside and (m := ROW.match(line)):
-            k, c = str(len(out) + 1), m.group(1)
-            out.append(c[len(k):].strip() if c.startswith(k + " ") else c)
-    return out
+        elif where == "section":
+            if re.match(r"\s*pauses\s*=\s*\[", line):
+                where = "list" if "]" not in line else "inline"  # an inline list has no comment per pause
+        elif where == "inline" or line.strip().startswith("]"):
+            break
+        elif m := PAUSE_ROW.match(line):
+            out.append(m.group(1) or "")
+            last = None
+        elif (m := COMMENT_ROW.match(line)) and last is None:
+            last = m.group(1)
+    if where == "before":
+        return []
+    return [CLIP_NUMBER.sub("", c) for c in out + [last or ""]]
 
 
 def video_box(vw, vh):

@@ -38,8 +38,33 @@ pauses = [
 
 def test_clip_comments():
     assert cut.clip_comments(PAUSES, "intro") == ["flow, step 1", "the fitted line", "(to the end)"]
-    assert cut.clip_comments(PAUSES, "my video") == ["a, step 1"]
+    assert cut.clip_comments(PAUSES, "my video") == ["a, step 1", ""]
     assert cut.clip_comments(PAUSES, "missing") == []
+
+
+EDITED = '''
+# a note above the section
+  [edited]  # 9.0 s
+# a note above the pauses
+title = "Edited"
+pauses = [
+  1.9,    # 1  first
+  4.0,
+          # 2  merged away: its number was deleted
+  # 5.5,  # 3  commented out
+  6.0,    # 3 standards on screen
+  8.0     # 4  last pause, no comma
+          # 5  (to the end)
+          # a second comment line
+]
+'''
+
+
+def test_clip_comments_follow_the_pauses_after_hand_edits():
+    """Note k belongs to clip k: a split without a comment, a deleted number, a commented-out pause, no trailing
+    comma, comment lines outside the list or wrapped onto a second line shift nothing."""
+    assert cut.clip_comments(EDITED, "edited") == ["first", "", "3 standards on screen", "last pause, no comma",
+                                                   "(to the end)"]
 
 
 def test_video_box():
