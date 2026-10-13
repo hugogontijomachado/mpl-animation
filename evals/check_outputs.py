@@ -12,11 +12,13 @@ import json
 import re
 import subprocess
 import sys
-import zipfile
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
+from lxml import etree
+from pptx import Presentation
+from pptx.oxml.ns import qn
 
 
 def probe(path):
@@ -124,26 +126,35 @@ def gif_checks(out):
             check("GIF holds its final state for at least 1 s before looping", hold >= 1.0, f"final hold {hold:.2f} s")]
 
 
+PPTX = ["Delivers a .pptx with the video's clips stacked on one slide",
+        "Clip 1 plays on the first click; each next click shows the next clip and plays it",
+        "The videos sit below the slide's title bar"]
+
+
 def pptx_checks(out, clips):
-    decks = list(out.rglob("*.pptx"))
+    decks = sorted(out.rglob("*.pptx"))
     if not decks:
-        return [check("Delivers a .pptx with one clip per slide", False, "no .pptx found"),
-                check("Every slide's video starts automatically (no click needed)", False, "no .pptx found")]
-    deck = decks[0]
-    z = zipfile.ZipFile(deck)
-    slides = sorted(n for n in z.namelist() if re.fullmatch(r"ppt/slides/slide\d+\.xml", n))
-    with_video, auto = 0, 0
-    for s in slides:
-        xml = z.read(s).decode("utf8", "ignore")
-        if "videoFile" in xml:
-            with_video += 1
-            if "mediacall" in xml and "clickEffect" not in xml:
-                auto += 1
-    return [check("Delivers a .pptx with one clip per slide",
-                  len(slides) >= 4 and with_video == len(slides) and (not clips or len(slides) == len(clips)),
-                  f"{deck.relative_to(out)}: {len(slides)} slides, {with_video} with video, {len(clips)} clips"),
-            check("Every slide's video starts automatically (no click needed)", slides and auto == len(slides),
-                  f"{auto} of {len(slides)} slides autoplay")]
+        return [check(t, False, "no .pptx found") for t in PPTX]
+    prs = Presentation(decks[0])
+    counts, clicks, below = [], [], []
+    for slide in prs.slides:
+        movies = [s for s in slide.shapes if s._element.find(".//" + qn("a:videoFile")) is not None]
+        if not movies:
+            continue
+        counts.append(len(movies))
+        t = slide._element.find(qn("p:timing"))
+        xml = etree.tostring(t).decode().split('nodeType="interactiveSeq"')[0] if t is not None else ""
+        kinds = re.findall(r'presetClass="(\w+)"[^>]*nodeType="(\w+)"', xml)
+        clicks.append(kinds == [("mediacall", "clickEffect")]
+                      + [("entr", "clickEffect"), ("mediacall", "afterEffect")] * (len(movies) - 1))
+        bar = max([(s.top or 0) + (s.height or 0) for s in slide.shapes
+                   if s._element.find(".//" + qn("a:videoFile")) is None and (s.top or 0) <= 0
+                   and (s.width or 0) >= 0.9 * prs.slide_width], default=0)
+        below.append(bar > 0 and all(m.top >= bar - 12700 for m in movies))
+    where = f"{decks[0].relative_to(out)}: videos per slide {counts}, {len(clips)} clips"
+    return [check(PPTX[0], len(clips) > 1 and len(clips) in counts, where),
+            check(PPTX[1], bool(clicks) and all(clicks), f"click pattern right on {sum(clicks)} of {len(clicks)}"),
+            check(PPTX[2], bool(below) and all(below), f"under the title bar on {sum(below)} of {len(below)}")]
 
 
 if __name__ == "__main__":
@@ -153,7 +164,9 @@ if __name__ == "__main__":
         res, _, _ = video_checks(out, 4)
     elif eid == 2:
         res = gif_checks(out)
-    else:
+    elif eid == 4:
+        res = []  # graded from the reply: does it ask what to deliver before rendering?
+    else:  # 3 and 5: video and deck
         res, _, clips = video_checks(out, 4)
         res += pptx_checks(out, clips)
     (run / "checks.json").write_text(json.dumps(res, indent=2, ensure_ascii=False))

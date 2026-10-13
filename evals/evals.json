@@ -4,7 +4,7 @@
     {
       "id": 1,
       "name": "chromatography-class",
-      "prompt": "Preciso de uma animação para minha aula de química analítica mostrando como uma coluna de cromatografia separa dois compostos: a mistura é injetada, os dois compostos andam pela coluna com velocidades diferentes (um interage mais com a fase estacionária) e, conforme saem da coluna, vão desenhando dois picos no cromatograma ao lado. Texto na tela em português. Quero conseguir pausar e explicar cada etapa durante a aula.",
+      "prompt": "Preciso de uma animação para minha aula de química analítica mostrando como uma coluna de cromatografia separa dois compostos: a mistura é injetada, os dois compostos andam pela coluna com velocidades diferentes (um interage mais com a fase estacionária) e, conforme saem da coluna, vão desenhando dois picos no cromatograma ao lado. Texto na tela em português. Quero conseguir pausar e explicar cada etapa durante a aula. Me entrega em MP4, sem .pptx.",
       "expected_output": "Stepwise animation (scenes/steps with a pause after each), MP4 1080p, cut into clips at the pauses with a pause sheet; Portuguese on-screen text; the compound that interacts more with the stationary phase elutes later and its peak is drawn as it leaves the column.",
       "files": [],
       "assertions": [
@@ -37,7 +37,7 @@
       "id": 3,
       "name": "calibration-curve-pptx",
       "prompt": "Tenho os dados da curva de calibração da cafeína em calibracao_cafeina.csv (concentração em mg/L e área do pico). Anima a construção da curva para a minha apresentação de amanhã: os padrões aparecendo, a reta ajustada, a equação e o R², e no final a concentração de uma amostra desconhecida com área 48210. Vou apresentar no PowerPoint, então já me entrega os trechos com pausas num .pptx. Texto em português.",
-      "expected_output": "MP4 + clips at pauses + a .pptx with one clip per slide; slope, intercept, R² and the unknown concentration computed from the CSV (not typed in); Portuguese text.",
+      "expected_output": "MP4 + clips at pauses + a .pptx with one slide whose stacked clips play one per click under a title bar; slope, intercept, R² and the unknown concentration computed from the CSV (not typed in); Portuguese text.",
       "files": [
         "evals/files/calibracao_cafeina.csv"
       ],
@@ -46,9 +46,44 @@
         "The video is cut into at least 4 clips",
         "Every clip ends on a still frame (last frame equals the frame 0.1 s before)",
         "Clips join seamlessly (last frame of each clip = first frame of the next)",
-        "Delivers a .pptx with one clip per slide",
-        "Every slide's video starts automatically (no click needed)",
+        "Delivers a .pptx with the video's clips stacked on one slide",
+        "Clip 1 plays on the first click; each next click shows the next clip and plays it",
+        "The videos sit below the slide's title bar",
         "Slope, intercept, R² and the unknown concentration on screen are computed from the CSV (≈4721.5, ≈637, R² ≈ 0.9999, ≈10.08 mg/L), not typed in",
+        "On-screen text is in Portuguese"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "asks-what-to-deliver",
+      "prompt": "Faz uma animação mostrando como a busca binária encontra um número numa lista ordenada de 16 elementos. Texto em inglês.",
+      "expected_output": "Before planning or rendering, the skill asks which deliverable the user wants (.gif, .mp4 or both) and, for .mp4, whether to also build the .pptx deck; it asks nothing about size, frame rate or other defaults.",
+      "files": [],
+      "assertions": [
+        "Before rendering anything, asks which format the user wants (.gif, .mp4 or both)",
+        "Offers the .pptx deck as an option for the .mp4",
+        "Does not ask about size, frame rate or other defaults"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "chromatography-timeline-pptx",
+      "prompt": "Anima uma linha do tempo da história da cromatografia para a minha aula: de Tswett (1903) até a HPLC e a GC-MS, com os marcos aparecendo um a um e um zoom quando chegar no período mais recente. Quero o MP4 e o .pptx com os trechos. Texto em português.",
+      "expected_output": "Starts from the timeline style; milestones enter one per step alternating above and below the axis, earlier ones dim, the axis zooms into the recent period; MP4 + clips + the click deck; dates checked, with sources in the docstring; Portuguese text.",
+      "files": [],
+      "assertions": [
+        "Delivers an MP4 video at 1920x1080, H.264, yuv420p",
+        "The video is cut into at least 4 clips",
+        "Every clip ends on a still frame (last frame equals the frame 0.1 s before)",
+        "Clips join seamlessly (last frame of each clip = first frame of the next)",
+        "Delivers a .pptx with the video's clips stacked on one slide",
+        "Clip 1 plays on the first click; each next click shows the next clip and plays it",
+        "The videos sit below the slide's title bar",
+        "Starts from the timeline style (styles/timeline/timeline.py)",
+        "Milestones enter one per step, alternating above and below the axis",
+        "Earlier milestones dim when a new one enters",
+        "The axis zooms into the recent period at least once",
+        "Dates on screen are checked, with sources in the script's docstring",
         "On-screen text is in Portuguese"
       ]
     }
