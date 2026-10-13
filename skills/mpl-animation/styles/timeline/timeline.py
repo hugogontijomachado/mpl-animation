@@ -26,14 +26,17 @@ Plan (one pause after each step):
 
 Facts (checked 2026-10-13; the pictures are redrawn with made-up numbers, as the cards say):
     1786  William Playfair, The Commercial and Political Atlas: the first line and bar charts of economic data
+          (the Atlas, London, 1786; Wikipedia, "William Playfair")
     1850–1900  "the Golden Age of statistical graphics" (M. Friendly, Statistical Science 23(4), 2008)
-    1858  Florence Nightingale's polar-area ("rose") diagrams of the deaths in the Crimean War
-    1869  Charles Joseph Minard's map of Napoleon's 1812 march on Moscow
+    1858  Florence Nightingale's polar-area ("rose") diagrams of the deaths in the Crimean War (her Notes on Matters
+          Affecting the Health, Efficiency and Hospital Administration of the British Army, 1858)
+    1869  Charles Joseph Minard's map of Napoleon's 1812 march on Moscow (Carte figurative des pertes successives
+          en hommes de l'Armée Française dans la campagne de Russie 1812–1813, Paris, 20 November 1869)
     1977  John W. Tukey, Exploratory Data Analysis (Addison-Wesley), which made the box plot known; the quote on
           the page card is attributed to this book (FlowingData, 2007; N. Yau, Data Points, 2013)
     2003  matplotlib's first release, by John D. Hunter (Hunter, Computing in Science & Engineering 9(3), 2007)
     2011  D3.js (Bostock, Ogievetsky & Heer, "D3: Data-Driven Documents", IEEE TVCG 17(12), 2011)
-    2014  Project Jupyter, spun off from IPython
+    2014  Project Jupyter, spun off from IPython (announced by Fernando Pérez in 2014; Wikipedia, "Project Jupyter")
 """
 import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg
