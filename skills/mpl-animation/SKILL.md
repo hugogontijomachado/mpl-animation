@@ -29,6 +29,8 @@ Read the request first. ".pptx", "PowerPoint", "slides" or "to present" means MP
 format. "GIF" alone means a GIF: nothing to ask. "Video" or "MP4" without a deck: ask only about the deck. A change,
 re-timing, re-cut or new version of an existing animation keeps the deliverables it already has: ask nothing. If the
 content fits a style (see Styles), offer it in the same round, next to "free", with the path of its `preview.gif`.
+If the request already names that kind of animation ("a timeline", "linha do tempo"), or there is nothing to ask,
+start from the style that fits and say so.
 
 | Choice | Deliverables |
 |---|---|
@@ -67,7 +69,8 @@ Everything else has a default and is not asked: make it and say what you made. W
 2. **Plan** the scenes and steps, and what is on screen at each pause, in the script's docstring. If the user
    asked for a proposal ("propose", "what do you think", "me proponha"), send the plan and wait. Otherwise build
    it and iterate: a finished draft gets better feedback than a description.
-3. **Write** the script from `example.py`: data and asserts at the top, one function per scene, `SCENES` last.
+3. **Write** the script from `example.py`, or from the chosen style's script: data and asserts at the top, one
+   function per scene, `SCENES` last.
 4. **Check without rendering** (seconds each), and look at the PNGs with Read:
    - `--preview`: the last frame of each scene (layout, overlaps, clipped text);
    - `--frames 3.4 7.9`: any instants (transitions, the middle of a movement);
