@@ -329,6 +329,8 @@ def main():
             build_pptx(videos, deck, args.bar, args.logo)
             check_deck(deck, videos)
             print(f"{deck.name}: {len(videos)} slides, {sum(len(c) for _, c, _ in videos)} clips, checked")
+            print("many videos can make PowerPoint lag: on the presenting computer, File > Options > Advanced > "
+                  "check 'Disable Slide Show hardware graphics acceleration'")
     print("pause sheets in", DEST)
 
 

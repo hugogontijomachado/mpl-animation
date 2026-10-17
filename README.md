@@ -34,6 +34,9 @@ O `.pptx` tem um slide por vídeo: o título no alto (simples, ou o padrão do C
 o símbolo do CEMEP à direita, `--cemep`) e, embaixo, os trechos empilhados. O trecho 1 toca no primeiro clique e
 cada clique seguinte faz o próximo aparecer e já tocar ("com o anterior"), continuando do quadro em que o outro
 parou; você encaixa a fala nas pausas. As notas do apresentador trazem o que está na tela em cada clique.
+Muitos vídeos deixam o PowerPoint lento e causam travadas em alguns computadores: no computador da apresentação,
+em Arquivo > Opções > Avançado, marque "Desativar a aceleração de elementos gráficos de hardware da apresentação de
+slides".
 
 ```bash
 uv run animations/<script>.py               # videos/<nome>.mp4 + último quadro; escreve as pausas em pauses.toml

@@ -270,6 +270,11 @@ By hand:
 While presenting, a click while a clip is still moving starts the next one and cuts the movement: wait for it to
 stop.
 
+Many videos make PowerPoint slow and cause lags and glitches on some computers. On the presenting computer: File >
+Options > Advanced (Arquivo > Opções > Avançado) → check "Disable Slide Show hardware graphics acceleration"
+("Desativar a aceleração de elementos gráficos de hardware da apresentação de slides"). It is a PowerPoint setting,
+not a property of the file.
+
 ## 15. Pitfalls
 
 - A system Python whose numpy/matplotlib builds don't match the machine: always run the scripts with `uv run`.

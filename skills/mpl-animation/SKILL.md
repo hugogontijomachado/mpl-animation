@@ -208,6 +208,11 @@ These defaults produced consistent, readable talks. Keep them unless the project
    run `cut.py` again); with a deck, that it was checked in structure and should be played once in presentation
    mode on the presenting computer; and every fact or number on screen they should double-check, separating what
    the script computed from what was typed in.
+4. **Whenever a deck was made**, always tell the user: many videos make PowerPoint slow and cause lags and glitches
+   on some computers; to avoid it, in PowerPoint go to File > Options > Advanced (Arquivo > Opções > Avançado) and
+   check "Disable Slide Show hardware graphics acceleration" ("Desativar a aceleração de elementos gráficos de
+   hardware da apresentação de slides"). It is a setting of PowerPoint on each computer, not of the file: do it on
+   the presenting computer.
 
 ## Styles
 
