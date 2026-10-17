@@ -83,8 +83,12 @@ def test_timing_pattern():
     xml = cut.timing([5, 6, 7], [1000, 2000, 3000])
     ET.fromstring(xml)  # well-formed
     kinds = re.findall(r'presetClass="(\w+)"[^>]*nodeType="(\w+)"', xml)
-    assert kinds == [("mediacall", "clickEffect"), ("entr", "clickEffect"), ("mediacall", "afterEffect"),
-                     ("entr", "clickEffect"), ("mediacall", "afterEffect")]
+    assert kinds == [("mediacall", "clickEffect"), ("entr", "clickEffect"), ("mediacall", "withEffect"),
+                     ("entr", "clickEffect"), ("mediacall", "withEffect")]
+    # each click is one inner <p:par> holding the appear and the play, as PowerPoint writes "with previous"
+    root = ET.fromstring(xml)
+    clicks = root.findall(".//{*}cTn[@nodeType='mainSeq']/{*}childTnLst/{*}par")
+    assert [len(c.findall("./{*}cTn/{*}childTnLst/{*}par/{*}cTn/{*}childTnLst/{*}par")) for c in clicks] == [1, 2, 2]
     plays = re.findall(r'dur="(\d+)" fill="hold"/><p:tgtEl><p:spTgt spid="(\d+)"', xml)
     assert plays == [("1000", "5"), ("2000", "6"), ("3000", "7")]
     ids = [int(i) for i in re.findall(r'<p:cTn id="(\d+)"', xml)]
@@ -102,12 +106,21 @@ def make_clip(path, size="320x180"):
 
 
 def test_deck_round_trip(tmp_path):
+    from pptx import Presentation
+    from pptx.dml.color import RGBColor
+
     a = [make_clip(tmp_path / f"a{k}.mp4") for k in (1, 2, 3)]
     b = [make_clip(tmp_path / "b1.mp4", "180x320")]  # one clip (no pauses), vertical
     videos = [("Intro", a, ["click 1 · x", "click 2", "click 3"]), ("Vertical", b, ["click 1"])]
     deck = tmp_path / "deck.pptx"
-    cut.build_pptx(videos, deck, "232751", a[0][1])
+    cut.build_pptx(videos, deck)  # the plain title
     cut.check_deck(deck, videos)
+    names = [s.name for s in Presentation(deck).slides[0].shapes]
+    assert "title bar" not in names and "logo" not in names
+    cut.build_pptx(videos, deck, cut.BAR, cut.CEMEP_LOGO)  # the CEMEP title
+    cut.check_deck(deck, videos)
+    shapes = {s.name: s for s in Presentation(deck).slides[0].shapes}
+    assert shapes["title bar"].fill.fore_color.rgb == RGBColor.from_string(cut.BAR) and "logo" in shapes
     with pytest.raises(SystemExit, match="notes"):
         cut.check_deck(deck, [videos[0], ("Vertical", b, ["other"])])
     with pytest.raises(SystemExit, match="slides"):

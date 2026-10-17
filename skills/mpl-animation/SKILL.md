@@ -13,9 +13,10 @@ steps, pause after every step, cut at the pauses.
 ## The rule: build in steps, then cut into clips
 
 Every animation is a list of scenes, and every scene a list of steps: a step moves, then holds still. The holds
-are where the video is cut. In the deck each video is one slide: a click plays a clip, which stops on its last
-frame while the presenter talks; the next click shows the next clip on top of it and plays it from exactly that
-frame. The audience sees one video that pauses; the presenter controls the pace.
+are where the video is cut. In the deck each video is one slide, under its title: a click plays a clip, which
+stops on its last frame while the presenter talks; the next click makes the next clip appear on top of it and
+play at the same moment ("with previous"), from exactly that frame. The audience sees one video that pauses; the
+presenter controls the pace.
 
 ## Ask what to deliver
 
@@ -24,9 +25,13 @@ only what the request leaves open:
 
 1. **Format**: MP4, GIF, or both.
 2. **If MP4**: also a PowerPoint deck, each video on one slide whose clips play one per click?
+3. **If a deck**: the CEMEP title (a blue bar, the title in white, the CEMEP symbol at its right end) or a plain
+   title? Either way the title has its space on top and the video sits under it. Ask it in the same round as 2,
+   for the case the answer to 2 is yes.
 
 Read the request first. ".pptx", "PowerPoint", "slides" or "to present" means MP4 + deck: nothing to ask about the
-format. "GIF" alone means a GIF: nothing to ask. "Video" or "MP4" without a deck: ask only about the deck. A change,
+format, ask only about the title. "CEMEP" in the request settles the title. "GIF" alone means a GIF: nothing to
+ask. "Video" or "MP4" without a deck: ask about the deck and its title. A change,
 re-timing, re-cut or new version of an existing animation keeps the deliverables it already has: ask nothing. If the
 content fits a style (see Styles), offer it in the same round, next to "free", with the path of its `preview.gif`.
 If the request already names that kind of animation ("a timeline", "linha do tempo"), or there is nothing to ask,
@@ -36,7 +41,7 @@ start from the style that fits and say so.
 |---|---|
 | GIF | `videos/<name>.gif` (`--gif`), 960 px, 20 fps; no clips (a GIF has no pause control); the MP4 it is made from stays in `videos/` |
 | MP4 | `videos/<name>.mp4` (1920×1080, 30 fps, H.264) and its last frame `videos/<name>.png`; the clips cut at the pauses, `videos/clips/<name>/01.mp4`, `02.mp4`, …; a sheet with the frame where each clip stops, `videos/clips/<name>_pauses.png`; the cut points, one comment per stop, in a `[<name>]` section of `animations/pauses.toml` |
-| MP4 + deck | all of the above, a slide title (`title`) in each video's section of `pauses.toml`, and `videos/clips/deck.pptx` (`cut.py --pptx`) |
+| MP4 + deck | all of the above, a slide title (`title`) in each video's section of `pauses.toml`, and `videos/clips/deck.pptx` (`cut.py --pptx`, plus `--cemep` for the CEMEP title) |
 
 Everything else has a default and is not asked: make it and say what you made. When the user asks for it:
 
@@ -44,13 +49,15 @@ Everything else has a default and is not asked: make it and say what you made. W
   nothing, and the pause checks keep catching half-finished frames.
 - **Another size, frame rate or aspect**: `W`, `H`, `FPS` at the top of `anim.py` (the canvas height follows).
 - **Clip GIFs** that play once and hold: `cut.py --gif`.
-- **The deck's look**: `cut.py --pptx --bar '#RRGGBB' --logo <png>` (the title bar's color, a logo at its right end).
+- **Another look for the title**: `cut.py --pptx --bar '#RRGGBB' --logo <png>` (the title in white on a bar of
+  that color, a logo at its right end).
 
 ## Setup
 
 1. If the project already has its own animation engine (a canvas/render module, a pauses file, a CLAUDE.md that
    describes them), use it and its conventions instead. Consistency across a talk matters more than this engine.
-2. Otherwise copy `scripts/anim.py` and `scripts/cut.py` into `<project>/animations/`, and start every new
+2. Otherwise copy `scripts/anim.py` and `scripts/cut.py` into `<project>/animations/` (and `scripts/cemep_logo.png`
+   too, for the CEMEP title), and start every new
    animation from a copy of `scripts/example.py`, or of a style's script (see Styles). Videos go to
    `<project>/videos/` (`OUT` in `anim.py`).
 3. Run scripts with `uv run animations/<script>.py`: each declares its dependencies in a PEP 723 header, so there
@@ -82,7 +89,7 @@ Everything else has a default and is not asked: make it and say what you made. W
    Replace each comment with what is on screen there: it documents the clips for whoever presents and becomes the
    presenter note of that click in the deck. With a deck, set the video's `title` too: it is the slide title. Later
    renders never overwrite a section; when the timing changed they print the new pauses, and you update the section.
-7. **Cut**: `uv run animations/cut.py <name>` (with `--gif` and `--pptx` as chosen), then look at
+7. **Cut**: `uv run animations/cut.py <name>` (with `--gif`, `--pptx` and `--cemep` as chosen), then look at
    `videos/clips/<name>_pauses.png`, which is made from the real MP4.
 8. **Verify and report** (last section).
 
@@ -182,9 +189,10 @@ These defaults produced consistent, readable talks. Keep them unless the project
 - **GIF** (`--gif`): 960 px wide, 20 fps, with a palette made for the video. Good for READMEs, docs and chats. Its
   limits: 256 colors (gradients band), files grow fast with motion and length (keep GIFs under ~15 s), no sound and
   no pause control. To present, prefer MP4 clips; `cut.py --gif` makes clip GIFs that play once and hold.
-- **Deck** (`cut.py --pptx`): `videos/clips/deck.pptx`, one 16:9 slide per video: a title bar (`#232751` by
-  default, `--bar`; the video's `title`; `--logo` at its right end) and under it the video's clips, stacked at the
-  largest size that fits. Clip 1 plays on the first click; each next click shows the next clip and plays it. The
+- **Deck** (`cut.py --pptx`): `videos/clips/deck.pptx`, one 16:9 slide per video: the video's `title` on top
+  (plain by default; `--cemep`: white on a `#232751` bar with the CEMEP symbol at its right end; `--bar`, `--logo`
+  for another look) and under it the video's clips, stacked at the largest size that fits. Clip 1 plays on the
+  first click; each next click makes the next clip appear and play at once ("with previous"). The
   presenter notes list each click with its pause comment. `cut.py` checks the deck after saving and will not
   overwrite it while PowerPoint has it open. By hand, and in Keynote or Google Slides: `references/recipes.md`,
   section 14.

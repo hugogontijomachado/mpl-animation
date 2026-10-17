@@ -9,15 +9,18 @@
     uv run animations/cut.py --sheet        # only the pause sheets (quick check of where the cuts fall)
     uv run animations/cut.py --gif          # also each clip as a GIF that plays once and holds its last frame
     uv run animations/cut.py --pptx         # also videos/clips/deck.pptx: one slide per video, one click per clip
-    uv run animations/cut.py --pptx --bar '#1f4e79' --logo animations/data/logo.png   # title bar color, a logo
+    uv run animations/cut.py --pptx --cemep # the deck with the CEMEP title: blue bar, white title, CEMEP symbol
+    uv run animations/cut.py --pptx --bar '#1f4e79' --logo animations/data/logo.png   # another bar color, a logo
 
 Renders nothing new and writes only under videos/clips/:
     <video>/01.mp4, 02.mp4, ...   the last frame of each clip is the first frame of the next (seamless)
     <video>_pauses.png            the frame where each clip stops, with its instant
-    deck.pptx                     one 16:9 slide per video cut in this run, in pauses.toml order: a title bar (the
-                                  video's `title` in pauses.toml) and under it the video's clips, stacked. Clip 1
-                                  plays on the first click; each next click shows the next clip and plays it. The
-                                  notes list each click with its pause comment. Checked after saving.
+    deck.pptx                     one 16:9 slide per video cut in this run, in pauses.toml order: the video's
+                                  `title` from pauses.toml on top (plain, or in a bar with --cemep or --bar) and
+                                  under it the video's clips, stacked. Clip 1 plays on the first click; each next
+                                  click shows the next clip and plays it at once ("with previous"), so the video
+                                  goes on from where it stopped. The notes list each click with its pause comment.
+                                  Checked after saving.
 """
 import argparse
 import itertools
@@ -28,13 +31,15 @@ import tempfile
 import tomllib
 from pathlib import Path
 
-from anim import OUT, PAUSES_FILE, sheet, to_gif
+from anim import INK, OUT, PAUSES_FILE, sheet, to_gif
 
 DEST = OUT / "clips"
-# the deck, in EMU: a 16:9 slide; a title bar 18% of its height; the title's left edge; the logo's height and margin
+# the deck, in EMU: a 16:9 slide; the title's space on top, 18% of its height; the title's left edge; the logo's
+# height and margin. The CEMEP title: this bar color, a white title, the CEMEP symbol (beside this script) at right.
 SLIDE_W, SLIDE_H, BAR_H = 12192000, 6858000, 1239520
 TITLE_X, LOGO_H, LOGO_MARGIN = 806991, 644550, 359252
 BAR = "232751"
+CEMEP_LOGO = Path(__file__).with_name("cemep_logo.png")
 
 
 def run(*cmd):
@@ -130,22 +135,20 @@ def refuse_if_open(deck):
 
 # A slide's animation as PowerPoint writes it (ported from a deck it played). Each click is one <p:par> of the main
 # sequence: the first plays clip 1, which is on screen from the start; every other one makes its clip appear and
-# then play. No togglePause triggers: a mouse click on a video advances, like the clicker.
+# play at the same moment ("with previous"): the clip shows the frame where the last one stopped and goes on from
+# it. No togglePause triggers: a mouse click on a video advances, like the clicker.
 CLICK = ('<p:par><p:cTn id="{id}" fill="hold"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst>'
-         '<p:childTnLst>{body}</p:childTnLst></p:cTn></p:par>')
-APPEAR = ('<p:par><p:cTn id="{a}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>'
-          '<p:par><p:cTn id="{b}" presetID="1" presetClass="entr" presetSubtype="0" fill="hold" '
+         '<p:childTnLst><p:par><p:cTn id="{inner}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst>'
+         '<p:childTnLst>{body}</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>')
+APPEAR = ('<p:par><p:cTn id="{b}" presetID="1" presetClass="entr" presetSubtype="0" fill="hold" '
           'nodeType="clickEffect"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst><p:set><p:cBhvr>'
           '<p:cTn id="{c}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>'
           '<p:tgtEl><p:spTgt spid="{sp}"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName>'
-          '</p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set></p:childTnLst></p:cTn></p:par>'
-          '</p:childTnLst></p:cTn></p:par>')
-PLAY = ('<p:par><p:cTn id="{a}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>'
-        '<p:par><p:cTn id="{b}" presetID="1" presetClass="mediacall" presetSubtype="0" fill="hold" '
+          '</p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set></p:childTnLst></p:cTn></p:par>')
+PLAY = ('<p:par><p:cTn id="{b}" presetID="1" presetClass="mediacall" presetSubtype="0" fill="hold" '
         'nodeType="{node}"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>'
         '<p:cmd type="call" cmd="playFrom(0.0)"><p:cBhvr><p:cTn id="{c}" dur="{dur}" fill="hold"/>'
-        '<p:tgtEl><p:spTgt spid="{sp}"/></p:tgtEl></p:cBhvr></p:cmd></p:childTnLst></p:cTn></p:par>'
-        '</p:childTnLst></p:cTn></p:par>')
+        '<p:tgtEl><p:spTgt spid="{sp}"/></p:tgtEl></p:cBhvr></p:cmd></p:childTnLst></p:cTn></p:par>')
 MEDIA = ('<p:video><p:cMediaNode vol="80000"><p:cTn id="{id}" fill="hold" display="0"><p:stCondLst>'
          '<p:cond delay="indefinite"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid="{sp}"/></p:tgtEl>'
          '</p:cMediaNode></p:video>')
@@ -162,18 +165,18 @@ def timing(spids, durs):
     ids = itertools.count(3)  # 1 and 2 are the root and the main sequence
     clicks = []
     for k, (sp, dur) in enumerate(zip(spids, durs)):
-        cid = next(ids)
-        appear = "" if k == 0 else APPEAR.format(a=next(ids), b=next(ids), c=next(ids), sp=sp)
-        play = PLAY.format(a=next(ids), b=next(ids), c=next(ids), sp=sp, dur=dur,
-                           node="clickEffect" if k == 0 else "afterEffect")
-        clicks.append(CLICK.format(id=cid, body=appear + play))
+        cid, inner = next(ids), next(ids)
+        appear = "" if k == 0 else APPEAR.format(b=next(ids), c=next(ids), sp=sp)
+        play = PLAY.format(b=next(ids), c=next(ids), sp=sp, dur=dur, node="clickEffect" if k == 0 else "withEffect")
+        clicks.append(CLICK.format(id=cid, inner=inner, body=appear + play))
     media = "".join(MEDIA.format(id=next(ids), sp=sp) for sp in spids)
     return TIMING.format(clicks="".join(clicks), media=media)
 
 
-def build_pptx(videos, dst, bar=BAR, logo=None):
+def build_pptx(videos, dst, bar=None, logo=None):
     """videos: [(title, clips, notes)], clips = [(mp4, poster png, duration ms, width, height)], notes = one line
-    per click. One slide per video: the title bar, then the clips stacked in order (01 at the back)."""
+    per click. One slide per video: the title on top, in white on a `bar` of that color or in INK on the white
+    slide; `logo` at its right end; then the clips stacked in order under it (01 at the back)."""
     from pptx import Presentation
     from pptx.dml.color import RGBColor
     from pptx.enum.shapes import MSO_SHAPE
@@ -186,12 +189,13 @@ def build_pptx(videos, dst, bar=BAR, logo=None):
     prs.slide_width, prs.slide_height = Emu(SLIDE_W), Emu(SLIDE_H)
     for title, clips, notes in videos:
         slide = prs.slides.add_slide(prs.slide_layouts[6])  # blank
-        band = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, SLIDE_W, BAR_H)
-        band.name = "title bar"
-        band.fill.solid()
-        band.fill.fore_color.rgb = RGBColor.from_string(bar)
-        band.line.fill.background()
-        band.shadow.inherit = False
+        if bar:
+            band = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, SLIDE_W, BAR_H)
+            band.name = "title bar"
+            band.fill.solid()
+            band.fill.fore_color.rgb = RGBColor.from_string(bar)
+            band.line.fill.background()
+            band.shadow.inherit = False
         right = SLIDE_W - LOGO_MARGIN  # where the title must end: before the logo, if there is one
         if logo:
             pic = slide.shapes.add_picture(str(logo), 0, (BAR_H - LOGO_H) // 2, height=LOGO_H)
@@ -206,7 +210,7 @@ def build_pptx(videos, dst, bar=BAR, logo=None):
         r = box.text_frame.paragraphs[0].add_run()
         r.text = title
         r.font.name, r.font.size, r.font.bold = "Arial", Pt(32), True
-        r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+        r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF) if bar else RGBColor.from_string(INK.lstrip("#"))
         spids, durs = [], []
         for k, (mp4, poster, dur, vw, vh) in enumerate(clips, 1):
             movie = slide.shapes.add_movie(str(mp4), *video_box(vw, vh), poster_frame_image=str(poster),
@@ -223,7 +227,7 @@ def build_pptx(videos, dst, bar=BAR, logo=None):
 
 def check_deck(deck, videos):
     """Reopen the deck and check what PowerPoint will play, against `videos` as given to build_pptx: one slide per
-    video with its title; its clips in order, under the title bar and inside the slide; the click pattern; each
+    video with its title; its clips in order, under the title's space and inside the slide; the click pattern; each
     play as long as its clip; the notes. Stops with an error otherwise."""
     from lxml import etree
     from pptx import Presentation
@@ -240,10 +244,10 @@ def check_deck(deck, videos):
             raise bad(f"{len(movies)} videos for {len(clips)} clips")
         for m in movies:
             if m.top < BAR_H or m.left < 0 or m.left + m.width > SLIDE_W or m.top + m.height > SLIDE_H:
-                raise bad(f"video {m.name} is not under the title bar and inside the slide")
+                raise bad(f"video {m.name} is not under the title and inside the slide")
         xml = etree.tostring(slide._element.find(qn("p:timing"))).decode()
         kinds = re.findall(r'presetClass="(\w+)"[^>]*nodeType="(\w+)"', xml)
-        want = [("mediacall", "clickEffect")] + [("entr", "clickEffect"), ("mediacall", "afterEffect")] * (
+        want = [("mediacall", "clickEffect")] + [("entr", "clickEffect"), ("mediacall", "withEffect")] * (
             len(clips) - 1)
         if kinds != want:
             raise bad(f"click pattern {kinds}")
@@ -266,13 +270,18 @@ def main():
     ap.add_argument("--sheet", action="store_true", help="only the pause sheets: cut nothing")
     ap.add_argument("--gif", action="store_true", help="also each clip as a GIF that plays once")
     ap.add_argument("--pptx", action="store_true", help="also build videos/clips/deck.pptx from the clips")
-    ap.add_argument("--bar", type=bar_color, default=BAR, help="the deck's title bar color (default #%(default)s)")
-    ap.add_argument("--logo", type=Path, help="a picture for the right end of the deck's title bar")
+    ap.add_argument("--cemep", action="store_true",
+                    help=f"the CEMEP title: a #{BAR} bar, the title in white, the CEMEP symbol at its right end")
+    ap.add_argument("--bar", type=bar_color, help="put the title in white on a bar of this color (default: no bar)")
+    ap.add_argument("--logo", type=Path, help="a picture for the right end of the title")
     args = ap.parse_args()
+    if args.cemep:
+        args.bar, args.logo = args.bar or BAR, args.logo or CEMEP_LOGO
     if not PAUSES_FILE.exists():
         raise SystemExit(f"no {PAUSES_FILE}: render a video first (it writes its section there)")
     if args.logo and not args.logo.is_file():
-        raise SystemExit(f"{args.logo} does not exist")
+        raise SystemExit(f"{args.logo} does not exist" + (": copy cemep_logo.png from the skill's scripts/ next to "
+                                                          "cut.py" if args.logo == CEMEP_LOGO else ""))
     text = PAUSES_FILE.read_text()
     config = tomllib.loads(text)
     names = args.videos or list(config)

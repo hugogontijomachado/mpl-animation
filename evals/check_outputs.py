@@ -127,8 +127,8 @@ def gif_checks(out):
 
 
 PPTX = ["Delivers a .pptx with the video's clips stacked on one slide",
-        "Clip 1 plays on the first click; each next click shows the next clip and plays it",
-        "The videos sit below the slide's title bar"]
+        "Clip 1 plays on the first click; each next click shows the next clip and plays it at the same moment (with previous)",
+        "The videos sit below the slide's title"]
 
 
 def pptx_checks(out, clips):
@@ -146,15 +146,14 @@ def pptx_checks(out, clips):
         xml = etree.tostring(t).decode().split('nodeType="interactiveSeq"')[0] if t is not None else ""
         kinds = re.findall(r'presetClass="(\w+)"[^>]*nodeType="(\w+)"', xml)
         clicks.append(kinds == [("mediacall", "clickEffect")]
-                      + [("entr", "clickEffect"), ("mediacall", "afterEffect")] * (len(movies) - 1))
+                      + [("entr", "clickEffect"), ("mediacall", "withEffect")] * (len(movies) - 1))
         bar = max([(s.top or 0) + (s.height or 0) for s in slide.shapes
-                   if s._element.find(".//" + qn("a:videoFile")) is None and (s.top or 0) <= 0
-                   and (s.width or 0) >= 0.9 * prs.slide_width], default=0)
+                   if s._element.find(".//" + qn("a:videoFile")) is None and (s.top or 0) <= 0], default=0)
         below.append(bar > 0 and all(m.top >= bar - 12700 for m in movies))
     where = f"{decks[0].relative_to(out)}: videos per slide {counts}, {len(clips)} clips"
     return [check(PPTX[0], len(clips) > 1 and len(clips) in counts, where),
             check(PPTX[1], bool(clicks) and all(clicks), f"click pattern right on {sum(clicks)} of {len(clicks)}"),
-            check(PPTX[2], bool(below) and all(below), f"under the title bar on {sum(below)} of {len(below)}")]
+            check(PPTX[2], bool(below) and all(below), f"under the title on {sum(below)} of {len(below)}")]
 
 
 if __name__ == "__main__":

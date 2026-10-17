@@ -25,13 +25,15 @@ Precisa de [uv](https://docs.astral.sh/uv/) e `ffmpeg`.
 
 É só pedir: "faz uma animação mostrando como a coluna separa dois compostos", "anima essa curva de calibração para
 a apresentação", "um GIF para o README mostrando o gradiente descendente". A skill primeiro pergunta o que você quer
-receber — .gif e/ou .mp4 e, com .mp4, se quer também o `.pptx` — só o que o pedido não disse. Depois copia o motor
-para `<projeto>/animations/` e segue a regra: planejar as etapas → conferir quadros sem renderizar → renderizar →
-cortar em trechos → conferir a folha de pausas → listar os fatos na tela para você conferir.
+receber — .gif e/ou .mp4 e, com .mp4, se quer também o `.pptx` e se o título segue o padrão do CEMEP — só o que
+o pedido não disse. Depois copia o motor para `<projeto>/animations/` e segue a regra: planejar as etapas →
+conferir quadros sem renderizar → renderizar → cortar em trechos → conferir a folha de pausas → listar os fatos na
+tela para você conferir.
 
-O `.pptx` tem um slide por vídeo: uma barra de título (cor e logo à escolha) e, embaixo, os trechos empilhados. O
-trecho 1 toca no primeiro clique e cada clique seguinte mostra e toca o próximo, então você encaixa a fala nas
-pausas. As notas do apresentador trazem o que está na tela em cada clique.
+O `.pptx` tem um slide por vídeo: o título no alto (simples, ou o padrão do CEMEP — barra azul, título em branco e
+o símbolo do CEMEP à direita, `--cemep`) e, embaixo, os trechos empilhados. O trecho 1 toca no primeiro clique e
+cada clique seguinte faz o próximo aparecer e já tocar ("com o anterior"), continuando do quadro em que o outro
+parou; você encaixa a fala nas pausas. As notas do apresentador trazem o que está na tela em cada clique.
 
 ```bash
 uv run animations/<script>.py               # videos/<nome>.mp4 + último quadro; escreve as pausas em pauses.toml
@@ -40,7 +42,7 @@ uv run animations/<script>.py --sheet       # folha com o quadro de cada pausa, 
 uv run animations/<script>.py --preview     # último quadro de cada cena
 uv run animations/<script>.py --frames 3 7  # quadros avulsos
 uv run animations/<script>.py --draft       # meia resolução, 15 fps (conferir o movimento rápido)
-uv run animations/cut.py [vídeos] [--gif] [--pptx] [--bar '#232751'] [--logo logo.png] [--sheet]
+uv run animations/cut.py [vídeos] [--gif] [--pptx] [--cemep] [--bar '#232751'] [--logo logo.png] [--sheet]
 ```
 
 ## Estilos

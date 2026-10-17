@@ -37,7 +37,7 @@
       "id": 3,
       "name": "calibration-curve-pptx",
       "prompt": "Tenho os dados da curva de calibração da cafeína em calibracao_cafeina.csv (concentração em mg/L e área do pico). Anima a construção da curva para a minha apresentação de amanhã: os padrões aparecendo, a reta ajustada, a equação e o R², e no final a concentração de uma amostra desconhecida com área 48210. Vou apresentar no PowerPoint, então já me entrega os trechos com pausas num .pptx. Texto em português.",
-      "expected_output": "MP4 + clips at pauses + a .pptx with one slide whose stacked clips play one per click under a title bar; slope, intercept, R² and the unknown concentration computed from the CSV (not typed in); Portuguese text.",
+      "expected_output": "MP4 + clips at pauses + a .pptx with one slide whose stacked clips play one per click under the title; slope, intercept, R² and the unknown concentration computed from the CSV (not typed in); Portuguese text.",
       "files": [
         "evals/files/calibracao_cafeina.csv"
       ],
@@ -47,8 +47,8 @@
         "Every clip ends on a still frame (last frame equals the frame 0.1 s before)",
         "Clips join seamlessly (last frame of each clip = first frame of the next)",
         "Delivers a .pptx with the video's clips stacked on one slide",
-        "Clip 1 plays on the first click; each next click shows the next clip and plays it",
-        "The videos sit below the slide's title bar",
+        "Clip 1 plays on the first click; each next click shows the next clip and plays it at the same moment (with previous)",
+        "The videos sit below the slide's title",
         "Slope, intercept, R² and the unknown concentration on screen are computed from the CSV (≈4721.5, ≈637, R² ≈ 0.9999, ≈10.08 mg/L), not typed in",
         "On-screen text is in Portuguese"
       ]
@@ -57,11 +57,12 @@
       "id": 4,
       "name": "asks-what-to-deliver",
       "prompt": "Faz uma animação mostrando como a busca binária encontra um número numa lista ordenada de 16 elementos. Texto em inglês.",
-      "expected_output": "Before planning or rendering, the skill asks which deliverable the user wants (.gif, .mp4 or both) and, for .mp4, whether to also build the .pptx deck; it asks nothing about size, frame rate or other defaults.",
+      "expected_output": "Before planning or rendering, the skill asks which deliverable the user wants (.gif, .mp4 or both) and, for .mp4, whether to also build the .pptx deck and, for the deck, whether the title follows the CEMEP standard; it asks nothing about size, frame rate or other defaults.",
       "files": [],
       "assertions": [
         "Before rendering anything, asks which format the user wants (.gif, .mp4 or both)",
         "Offers the .pptx deck as an option for the .mp4",
+        "Asks, for the deck, whether the title follows the CEMEP standard (blue bar, white title, CEMEP symbol) or is plain",
         "Does not ask about size, frame rate or other defaults"
       ]
     },
@@ -77,8 +78,8 @@
         "Every clip ends on a still frame (last frame equals the frame 0.1 s before)",
         "Clips join seamlessly (last frame of each clip = first frame of the next)",
         "Delivers a .pptx with the video's clips stacked on one slide",
-        "Clip 1 plays on the first click; each next click shows the next clip and plays it",
-        "The videos sit below the slide's title bar",
+        "Clip 1 plays on the first click; each next click shows the next clip and plays it at the same moment (with previous)",
+        "The videos sit below the slide's title",
         "Starts from the timeline style (styles/timeline/timeline.py)",
         "Milestones enter one per step, alternating above and below the axis",
         "Earlier milestones dim when a new one enters",

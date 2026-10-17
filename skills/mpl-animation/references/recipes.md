@@ -248,10 +248,10 @@ txt(96, 50, r"$P(x_{t+1} \mid x_1 \ldots x_t)$", size=30, ha="center")
 
 ## 14. Presenting the clips
 
-`cut.py --pptx` writes `videos/clips/deck.pptx`: 16:9, one slide per video, a title bar on top (`--bar` color,
-`--logo`, the title from `title` in `pauses.toml`) and the video's clips stacked under it at the same place. Clip 1
-is on screen when the slide opens and plays on the first click; each further click shows the next clip on top and
-plays it. Each clip starts on the frame where the previous one stopped, so the audience sees one video that pauses.
+`cut.py --pptx` writes `videos/clips/deck.pptx`: 16:9, one slide per video, the title from `title` in
+`pauses.toml` on top (plain; `--cemep` for the CEMEP bar and symbol; `--bar` color and `--logo` for another look)
+and the video's clips stacked under it at the same place. Clip 1 is on screen when the slide opens and plays on the
+first click; each further click makes the next clip appear on top and play at the same moment. Each clip starts on the frame where the previous one stopped, so the audience sees one video that pauses.
 The presenter notes list each click with its pause comment. Copy the slides into the real deck (paste with "keep
 source formatting"). The deck is checked in structure; play it once in presentation mode on the presenting
 computer.
@@ -259,7 +259,7 @@ computer.
 By hand:
 
 - **PowerPoint**, one slide per video: insert every clip at the same position and size, in order (01 at the back).
-  Animations: clip 01 → Play, "On Click"; each next clip → Appear, "On Click", then Play, "After Previous".
+  Animations: clip 01 → Play, "On Click"; each next clip → Appear, "On Click", then Play, "With Previous".
   Playback: "Rewind after playing" off (keeps the last frame on screen), "Hide while not playing" off. Transitions →
   None.
 - **Keynote**: one clip per slide, full size; in the Movie tab of the Format sidebar, start the movie automatically
